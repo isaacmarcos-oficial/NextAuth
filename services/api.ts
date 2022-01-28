@@ -1,5 +1,7 @@
 import axios, { AxiosError } from "axios";
-import { parseCookies, setCookie } from 'nookies'
+import Router from "next/router";
+import { destroyCookie, parseCookies, setCookie } from 'nookies'
+import { signOut } from "../contexts/AuthContext";
 
 let cookies = parseCookies();
 let isRefreshing = false;
@@ -12,7 +14,7 @@ export const api = axios.create({
   }
 });
 
-api.interceptors.request.use(response => {
+api.interceptors.response.use(response => {
   return response;
 }, (error: AxiosError) => {
   if (error.response.status === 401) {
@@ -65,7 +67,9 @@ api.interceptors.request.use(response => {
         })
       })
     } else {
-      //deslogar o usuário
+        signOut();
     }
   }
+
+  return Promise.reject(error);
 });
